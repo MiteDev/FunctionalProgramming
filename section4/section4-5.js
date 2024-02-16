@@ -73,8 +73,9 @@ go(
 
 
 
-// const mult = curry((a, b) => a * b);
-// const mult3 = mult(3)
+const mult = curry((a, b) => a * b);
+const mult3 = mult(3, 6)
+console.log(mult3)
 // console.log(mult3(1));
 // console.log(mult3(2));
 // console.log(mult3(3));
