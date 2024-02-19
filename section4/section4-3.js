@@ -1,44 +1,9 @@
-// Functional Programming은 코드를 값으로 다루는 방법을 많이 사용함
+// curry: 함수를 값으로 받으면서 받아둔 함수를 내가 원하는 시점에 평가시키는 함수
+// 인자를 받아서 인자를 원하는 갯수 만큼 들어왔을 때 받아두었던 함수는 나중에 평가시키는 함수
 
+const go = (...args) => args.reduce((acc, cur) => cur(acc));
 
-const map = (func, iter) => {
-    let rst = [];
-    for (const i of iter) {
-        rst.push(func(i));
-    }
-    return rst;
-}
-
-const filter = (func, iter) => {
-    let rst = [];
-    for (const i of iter) {
-        if (func(i)) rst.push(i);
-    }
-    return rst;
-}
-
-const reduce = (func, acc, iter) => {
-    console.log(func)
-    if (!iter) {
-        iter = acc[Symbol.iterator]();
-        acc = iter.next().value;
-    }
-    for (const i of iter) {
-        acc = func(acc, i)
-    }
-    return acc;
-}
-
-// console.log(reduce((a, b) => a - b, [1, 2, 3]))
-
-// Pipe => 함수들이 나열된 합성된 함수를 만드는 함수
-const go = (...args) => reduce((a, f) => f(a), args);
-// const pipe = (f, ...fs) => (...a) => go(f(...a), ...fs);
-// const pipe = (...fs) => (a) => go(a, ...fs)
-
-const func = (a, f) => f(a);
-
-const pipe = (f, ...funcs) => (...arg) => reduce(func, f(...arg), funcs);
+const curry = f => (a, ..._) => _.length ? f(a, ..._) : (..._) => f(a, ..._);
 
 const products = [
     { name: '반팔티', price: 15000 },
@@ -48,11 +13,17 @@ const products = [
     { name: '바지', price: 25000 },
 ];
 
-const add = (a, b) => a + b;
+const c_map = curry((fn, arr) => {
+    console.log(arr)
+    return arr.map(fn)
+});
+const c_filter = curry((fn, arr) => arr.filter(fn));
+const c_reduce = curry((fn, arr) => arr.reduce(fn))
 
 go(
-    map(a => a.price, products),
-    price => filter(p => p <= 20000, price),
-    price_cond => reduce(add, price_cond),
+    products,
+    c_map(p => p.price),
+    c_filter(p => p < 20000),
+    c_reduce((acc, cur) => acc + cur),
     console.log
 )
